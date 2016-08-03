@@ -1,0 +1,18 @@
+{
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "quantidadeHashes",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "tempo",
+            "fieldType": "BigDecimal(15,2)"
+        }
+    ],
+    "changelogDate": "20160803131258",
+    "dto": "no",
+    "service": "serviceImpl",
+    "entityTableName": "cripto",
+    "pagination": "pager"
+}

@@ -6,7 +6,7 @@ services:
         # volumes:
         #     - ~/volumes/jhipster/powercripto/postgresql/:/var/lib/postgresql/
         environment:
-            - POSTGRES_USER=powercripto
-            - POSTGRES_PASSWORD=
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
         ports:
             - 5432:5432
