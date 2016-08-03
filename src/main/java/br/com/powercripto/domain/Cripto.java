@@ -25,6 +25,9 @@ public class Cripto implements Serializable {
     @Column(name = "tempo", precision=15, scale=2)
     private BigDecimal tempo;
 
+    @Column(name = "quantidade_bit_zero")
+    private Long quantidadeBitZero;
+
     public Long getId() {
         return id;
     }
@@ -47,6 +50,14 @@ public class Cripto implements Serializable {
 
     public void setTempo(BigDecimal tempo) {
         this.tempo = tempo;
+    }
+
+    public Long getQuantidadeBitZero() {
+        return quantidadeBitZero;
+    }
+
+    public void setQuantidadeBitZero(Long quantidadeBitZero) {
+        this.quantidadeBitZero = quantidadeBitZero;
     }
 
     @Override
@@ -75,6 +86,7 @@ public class Cripto implements Serializable {
             "id=" + id +
             ", quantidadeHashes='" + quantidadeHashes + "'" +
             ", tempo='" + tempo + "'" +
+            ", quantidadeBitZero='" + quantidadeBitZero + "'" +
             '}';
     }
 }

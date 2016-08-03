@@ -1,25 +1,18 @@
 package br.com.powercripto.service.impl;
 
-import br.com.powercripto.service.CriptoService;
 import br.com.powercripto.domain.Cripto;
 import br.com.powercripto.repository.CriptoRepository;
-import br.com.powercripto.service.util.ByteArrayBitIterable;
-import br.com.powercripto.service.util.CriptoUtil;
+import br.com.powercripto.service.CriptoService;
+import br.com.powercripto.service.util.ThreadHashCalculation;
 import br.com.powercripto.service.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Service Implementation for managing Cripto.
@@ -42,21 +35,41 @@ public class CriptoServiceImpl implements CriptoService {
     public Cripto save(Cripto cripto) {
         log.debug("Request to save Cripto : {}", cripto);
 
-        try {
-            log.debug("Iniciando calculo de hashes...");
+        log.debug("Iniciando calculo de hashes...");
 
-            Timer timer = new Timer();
-            timer.start();
+        Timer timer = new Timer();
+        timer.start();
 
-            CriptoUtil.calcularHash(1);
+        ThreadHashCalculation t1 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
+        ThreadHashCalculation t2 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
+        ThreadHashCalculation t3 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
+        ThreadHashCalculation t4 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
 
-            timer.end();
-            cripto.setTempo(timer.getTotalTime());
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
 
-            log.debug("calculo de hashes concluído em: " + timer.getTotalTime().toString());
-        } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
+        t1.run();
+        t2.run();
+        t3.run();
+        t4.run();
+
+        while (t1.isThreadRunning() || t2.isThreadRunning() || t3.isThreadRunning() || t4.isThreadRunning()) {
+            //wait while threads are running, when the first ends, the other will stop, by following command from the volatile boolean
         }
+
+        Long quantidadeHashesCalculado = 0L;
+        quantidadeHashesCalculado += t1.stopThread();
+        quantidadeHashesCalculado += t2.stopThread();
+        quantidadeHashesCalculado += t3.stopThread();
+        quantidadeHashesCalculado += t4.stopThread();
+
+        timer.end();
+        cripto.setTempo(timer.getTotalTime());
+        cripto.setQuantidadeHashes(quantidadeHashesCalculado);
+
+        log.debug("calculo de hashes concluído em: " + timer.getTotalTime().toString());
 
         Cripto result = criptoRepository.save(cripto);
         return result;

@@ -117,6 +117,7 @@
                             return {
                                 quantidadeHashes: null,
                                 tempo: null,
+                                quantidadeBitZero: null,
                                 id: null
                             };
                         }

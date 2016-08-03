@@ -8,9 +8,13 @@
         {
             "fieldName": "tempo",
             "fieldType": "BigDecimal(15,2)"
+        },
+        {
+            "fieldName": "quantidadeBitZero",
+            "fieldType": "Long"
         }
     ],
-    "changelogDate": "20160803131258",
+    "changelogDate": "20160803194323",
     "dto": "no",
     "service": "serviceImpl",
     "entityTableName": "cripto",

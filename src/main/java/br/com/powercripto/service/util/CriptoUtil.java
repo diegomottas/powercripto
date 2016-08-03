@@ -10,35 +10,25 @@ import java.util.Random;
  */
 public class CriptoUtil {
 
-    public static String calcularHash(int quantidadeBitsZeros) throws NoSuchAlgorithmException {
-
-        byte[] digest;
-        do {
-            digest = gerarNovoHash();
-        } while (verificaQuantidadeBitsZeros(digest, quantidadeBitsZeros));
-
-        return new String(digest);
-    }
-
-    private static boolean verificaQuantidadeBitsZeros(byte[] b, int quantidadeBitsZeros) {
-        int quantidadeIteracoes = 0;
+    public static boolean verificaQuantidadeBitsZeros(byte[] b, Long quantidadeBitsZeros) {
+        Long quantidadeIteracoes = 0L;
         Iterator<Boolean> iterator = new ByteArrayBitIterable(b).iterator();
         while (iterator.hasNext()) {
             Boolean bit1 = iterator.next();
-            if(bit1) {
-                return false;
+            if (bit1) {
+                return true;
             } else {
                 quantidadeIteracoes++;
                 if (quantidadeIteracoes >= quantidadeBitsZeros) {
-                    return true;
+                    return false;
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
-    private static byte[] gerarNovoHash() throws NoSuchAlgorithmException {
+    public static byte[] gerarNovoHash() throws NoSuchAlgorithmException {
         byte[] b = new byte[300];
         new Random().nextBytes(b);
 
