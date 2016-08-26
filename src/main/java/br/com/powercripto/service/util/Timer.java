@@ -26,6 +26,6 @@ public class Timer {
     }
 
     public BigDecimal getTotalTime() {
-        return new BigDecimal(this.endTime).min(new BigDecimal(this.startTime));
+        return new BigDecimal(this.endTime).subtract(new BigDecimal(this.startTime));
     }
 }

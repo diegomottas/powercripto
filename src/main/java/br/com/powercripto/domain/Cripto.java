@@ -22,7 +22,7 @@ public class Cripto implements Serializable {
     @Column(name = "quantidade_hashes")
     private Long quantidadeHashes;
 
-    @Column(name = "tempo", precision=10, scale=2)
+    @Column(name = "tempo", precision=15, scale=2)
     private BigDecimal tempo;
 
     @Column(name = "quantidade_bit_zero")

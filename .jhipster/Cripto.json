@@ -7,7 +7,7 @@
         },
         {
             "fieldName": "tempo",
-            "fieldType": "BigDecimal"
+            "fieldType": "BigDecimal(15,2)"
         },
         {
             "fieldName": "quantidadeBitZero",
