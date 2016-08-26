@@ -34,6 +34,15 @@ public class Cripto implements Serializable {
     @Column(name = "hash")
     private String hash;
 
+    public Cripto(Long quantidadeBitZero, Long quantidadeRegistros) {
+        this.quantidadeBitZero = quantidadeBitZero;
+        this.quantidadeRegistros = quantidadeRegistros;
+    }
+
+    public Cripto() {
+
+    }
+
     public Long getId() {
         return id;
     }

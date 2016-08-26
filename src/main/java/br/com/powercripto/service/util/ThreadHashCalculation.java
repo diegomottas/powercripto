@@ -42,7 +42,7 @@ public class ThreadHashCalculation extends Thread {
                 quantidadeHashesCalculado++;
             } while (CriptoUtil.verificaQuantidadeBitsZeros(digest, quantidadeBitZero) && threadRunning);
 
-            hash = new String(digest);
+            hash = CriptoUtil.bytesToHex(digest);
 
             threadRunning = false;
         } catch (NoSuchAlgorithmException e) {

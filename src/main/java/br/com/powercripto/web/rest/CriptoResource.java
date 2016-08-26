@@ -5,6 +5,7 @@ import br.com.powercripto.domain.Cripto;
 import br.com.powercripto.service.CriptoService;
 import br.com.powercripto.web.rest.util.HeaderUtil;
 import br.com.powercripto.web.rest.util.PaginationUtil;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -29,10 +30,10 @@ import java.util.Optional;
 public class CriptoResource {
 
     private final Logger log = LoggerFactory.getLogger(CriptoResource.class);
-        
+
     @Inject
     private CriptoService criptoService;
-    
+
     /**
      * POST  /criptos : Create a new cripto.
      *
@@ -93,7 +94,7 @@ public class CriptoResource {
     public ResponseEntity<List<Cripto>> getAllCriptos(Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Criptos");
-        Page<Cripto> page = criptoService.findAll(pageable); 
+        Page<Cripto> page = criptoService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/criptos");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

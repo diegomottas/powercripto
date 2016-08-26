@@ -5,6 +5,7 @@ import br.com.powercripto.repository.CriptoRepository;
 import br.com.powercripto.service.CriptoService;
 import br.com.powercripto.service.util.ThreadHashCalculation;
 import br.com.powercripto.service.util.Timer;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service Implementation for managing Cripto.
@@ -22,6 +25,9 @@ import javax.inject.Inject;
 public class CriptoServiceImpl implements CriptoService {
 
     private final Logger log = LoggerFactory.getLogger(CriptoServiceImpl.class);
+
+    private int numberOfThreads;
+    private List<ThreadHashCalculation> lstThreadHashCalculations;
 
     @Inject
     private CriptoRepository criptoRepository;
@@ -37,42 +43,89 @@ public class CriptoServiceImpl implements CriptoService {
 
         log.debug("Iniciando calculo de hashes...");
 
+        numberOfThreads = 4;
+        if (cripto.getQuantidadeRegistros() == null || cripto.getQuantidadeRegistros() < 1) {
+            cripto.setQuantidadeRegistros(1L);
+        }
+
+        Cripto ultimoResultado = null;
+
+        for (int i = 0; i < cripto.getQuantidadeRegistros(); i++) {
+            Cripto clone = new Cripto(cripto.getQuantidadeBitZero(), cripto.getQuantidadeRegistros());
+            ultimoResultado = gerarCripto(clone);
+        }
+
+        return ultimoResultado;
+    }
+
+    private Cripto gerarCripto(Cripto cripto) {
+        instantiateThreads(cripto);
+
         Timer timer = new Timer();
         timer.start();
 
-        ThreadHashCalculation t1 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
-        ThreadHashCalculation t2 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
-        ThreadHashCalculation t3 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
-        ThreadHashCalculation t4 = new ThreadHashCalculation(cripto.getQuantidadeBitZero());
+        startThreads();
+        runThreads();
 
-        t1.start();
-        t2.start();
-        t3.start();
-        t4.start();
-
-        t1.run();
-        t2.run();
-        t3.run();
-        t4.run();
-
-        while (t1.isThreadRunning() || t2.isThreadRunning() || t3.isThreadRunning() || t4.isThreadRunning()) {
+        while (areAllThreadsRunning()) {
             //wait while threads are running, when the first ends, the other will stop, by following command from the volatile boolean
         }
 
-        Long quantidadeHashesCalculado = 0L;
-        quantidadeHashesCalculado += t1.stopThread();
-        quantidadeHashesCalculado += t2.stopThread();
-        quantidadeHashesCalculado += t3.stopThread();
-        quantidadeHashesCalculado += t4.stopThread();
+        Long quantidadeHashesCalculado = stopThreads();
 
         timer.end();
         cripto.setTempo(timer.getTotalTime());
         cripto.setQuantidadeHashes(quantidadeHashesCalculado);
+        cripto.setHash(getResultHash());
 
         log.debug("calculo de hashes concluído em: " + timer.getTotalTime().toString());
 
-        Cripto result = criptoRepository.save(cripto);
-        return result;
+        return criptoRepository.save(cripto);
+    }
+
+    private void instantiateThreads(Cripto cripto) {
+        lstThreadHashCalculations = new ArrayList<>();
+        for (int i = 0; i < numberOfThreads; i++) {
+            lstThreadHashCalculations.add(new ThreadHashCalculation(cripto.getQuantidadeBitZero()));
+        }
+    }
+
+    private void startThreads() {
+        for (ThreadHashCalculation thread : lstThreadHashCalculations) {
+            thread.start();
+        }
+    }
+
+    private Long stopThreads() {
+        Long quantidadeHashesCalculado = 0L;
+        for (ThreadHashCalculation thread : lstThreadHashCalculations) {
+            quantidadeHashesCalculado += thread.stopThread();
+        }
+        return quantidadeHashesCalculado;
+    }
+
+    private void runThreads() {
+        for (ThreadHashCalculation thread : lstThreadHashCalculations) {
+            thread.run();
+        }
+    }
+
+    private boolean areAllThreadsRunning() {
+        for (ThreadHashCalculation thread : lstThreadHashCalculations) {
+            if (!thread.isThreadRunning()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getResultHash() {
+        for (ThreadHashCalculation thread : lstThreadHashCalculations) {
+            if (thread.getHash() != null && !thread.getHash().isEmpty()) {
+                return thread.getHash();
+            }
+        }
+        return null;
     }
 
     /**
