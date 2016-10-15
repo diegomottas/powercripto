@@ -53,6 +53,7 @@ public class CriptoServiceImpl implements CriptoService {
         for (int i = 0; i < cripto.getQuantidadeRegistros(); i++) {
             Cripto clone = new Cripto(cripto.getQuantidadeBitZero(), cripto.getQuantidadeRegistros());
             ultimoResultado = gerarCripto(clone);
+            log.debug("Hash " + (i+1) + "/" + cripto.getQuantidadeRegistros() + " gerado.");
         }
 
         return ultimoResultado;
